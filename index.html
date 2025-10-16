@@ -1,0 +1,322 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Benimle Tanışmak İster Misin?</title>
+  <style>
+    :root{
+      --bg1: #071021;
+      --card: rgba(255,255,255,0.06);
+      --accent1:#7c3aed;
+      --accent2:#06b6d4;
+      --good:#6dd47e;
+      --bad:#ff7272;
+      --muted:#b6bec8;
+      --glass: rgba(255,255,255,0.03);
+    }
+    /* Reset & base */
+    *{box-sizing:border-box}
+    html,body{height:100%;margin:0;font-family:Inter,system-ui,-apple-system,'Segoe UI',Roboto,Arial;color:#eaf2ff;background:linear-gradient(120deg,#071021,#04122a);-webkit-font-smoothing:antialiased}
+    a{color:inherit}
+
+    /* page wrapper */
+    .wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:18px}
+
+    /* card */
+    .card{width:100%;max-width:460px;background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));border-radius:16px;padding:20px;box-shadow:0 12px 30px rgba(2,6,23,0.6);backdrop-filter: blur(6px);border:1px solid rgba(255,255,255,0.03);}
+    .card .row{display:flex;gap:14px;align-items:center}
+    .profile{width:96px;height:96px;border-radius:18px;overflow:hidden;border:2px solid rgba(255,255,255,0.05);background:var(--glass);flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .profile img{width:100%;height:100%;object-fit:cover;display:block}
+    .title{font-size:20px;margin:0 0 6px}
+    .lead{color:var(--muted);font-size:14px;margin:0 0 12px}
+
+    /* buttons area */
+    .buttons{display:flex;gap:10px;margin-top:8px}
+    .btn{flex:1;display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:12px;padding:14px 12px;font-weight:700;font-size:16px;cursor:pointer;transition:transform .12s ease, box-shadow .12s;touch-action:manipulation}
+    .btn:active{transform:translateY(2px)}
+    .btn-yes{background:linear-gradient(90deg,var(--accent1),var(--accent2));color:white;box-shadow:0 8px 20px rgba(0,0,0,0.28)}
+    .btn-no{background:transparent;border:1px solid rgba(255,255,255,0.04);color:var(--muted)}
+
+    .meta{margin-top:10px;color:var(--muted);font-size:13px}
+
+    /* pages (below card) */
+    .page{display:none;max-width:460px;margin:16px auto 40px}
+    .page.active{display:block}
+    .page-card{background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));padding:14px;border-radius:12px;border:1px solid rgba(255,255,255,0.03);box-shadow:0 6px 18px rgba(2,6,23,0.45)}
+    .page-card h2{margin:0 0 8px;font-size:20px}
+    .page-card p{color:var(--muted);margin:0 0 10px}
+
+    /* form - mobile friendly */
+    form{display:flex;flex-direction:column;gap:10px}
+    textarea{min-height:90px;padding:10px;border-radius:10px;border:1px solid rgba(255,255,255,0.04);background:transparent;color:inherit;font-size:15px;resize:vertical}
+    .small{font-size:13px;color:var(--muted)}
+
+    /* goodbye screen */
+    #goodbyePage .page-card{text-align:center;padding:22px}
+
+    /* confetti canvas (top layer) */
+    #confettiCanvas{position:fixed;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:9999}
+
+    /* responsive adjustments */
+    @media (max-width:420px){
+      .card{padding:16px;border-radius:14px}
+      .profile{width:84px;height:84px}
+      .title{font-size:18px}
+      .btn{padding:12px;font-size:15px;border-radius:11px}
+      textarea{min-height:80px}
+    }
+  </style>
+</head>
+<body>
+  <canvas id="confettiCanvas" aria-hidden></canvas>
+
+  <div class="wrap">
+    <div class="card" role="main" aria-labelledby="mainTitle">
+      <div class="row" style="align-items:center">
+        <div class="profile" aria-hidden>
+          <!-- Profil fotoğrafını index.html ile aynı klasöre koy: profile.jpg veya src'yi düzenle -->
+          <img id="profilePhoto" src="profile.jpg" alt="Profil fotoğrafı" onerror="this.style.filter='grayscale(60%)';this.alt='Profil fotoğrafı bulunamadı'">
+        </div>
+
+        <div style="flex:1">
+          <h1 id="mainTitle" class="title">Benimle tanışmak ister misin?</h1>
+          <p class="lead">Kısa ve sade bir tanışma — seçeneğine göre farklı bir sayfa göstereceğim.</p>
+
+          <div class="buttons" role="group" aria-label="Seçenekler">
+            <button id="btnYes" class="btn btn-yes" aria-label="Evet, tanışmak istiyorum">evettttt ✅</button>
+            <button id="btnNo" class="btn btn-no" aria-label="Hayır, istemiyorum">hayır 😔</button>
+          </div>
+
+          <div class="meta small">Fotoğrafı değiştirmek için proje klasörüne <code>profile.jpg</code> koy veya <code>&lt;img src=&quot;URL&quot;&gt;</code> düzenle.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Evet sayfas -->
+  <section id="yes" class="page" aria-label="Evet sayfas">
+    <div class="page-card">
+      <h2>Harika! 🎉</h2>
+      <p>Instagram hesabıma yönlendirileceksin — önce küçük bir konfeti sürprizi olacak.</p>
+      <div style="display:flex;gap:10px;flex-wrap:wrap">
+        <button id="btnProceedIG" class="btn btn-yes" style="flex:1;min-height:48px">Instagram'a Git</button>
+        <button class="btn btn-no" style="flex:1;min-height:48px" onclick="navigate('home')">Geri</button>
+      </div>
+      <p id="yesNotice" class="small" style="display:none;margin-top:10px">Konfeti başladı — Instagram yeni sekmede açılıyor...</p>
+    </div>
+  </section>
+
+  <!-- Hayır sayfas -->
+  <section id="no" class="page" aria-label="Hayır sayfas">
+    <div class="page-card">
+      <h2>Üzgünüm 😔</h2>
+      <p class="small">Kısa bir neden yazarsan sevinirim — mesajın e-postama gönderilecek.</p>
+
+      <form id="noForm" action="https://formspree.io/f/xovkybow" method="POST">
+        <label for="reason" class="small" style="margin-bottom:6px">Kısa neden (opsiyonel)</label>
+        <textarea id="reason" name="message" placeholder="Neden ilgilenmiyorsun?" autocomplete="off"></textarea>
+        <div style="display:flex;gap:8px">
+          <button type="submit" class="btn btn-no" style="flex:1;min-height:48px">Gönder</button>
+          <button type="button" class="btn btn-yes" style="flex:1;min-height:48px" onclick="navigate('home')">Geri</button>
+        </div>
+      </form>
+
+      <p id="noFeedbackMsg" class="small" style="display:none;margin-top:10px;color:var(--good)">Teşekkürler! Yanıtın kaydedildi 💌</p>
+    </div>
+  </section>
+
+  <!-- Goodbye -->
+  <section id="goodbyePage" class="page" aria-label="Veda sayfas">
+    <div class="page-card">
+      <h2>Instagram'a yönlendirildin!</h2>
+      <p class="small">Yeni sekmede Instagram açıldıysa orada görüşürüz. Ana sayfaya dönmek için düğmeyi kullan.</p>
+      <div style="margin-top:12px;display:flex;gap:8px">
+        <button class="btn btn-no" onclick="navigate('home')" style="flex:1;min-height:48px">Ana Sayfaya Dön</button>
+      </div>
+    </div>
+  </section>
+
+<script>
+  // Ayarlar
+  const INSTAGRAM_URL = 'https://www.instagram.com/alpern.kaya/';
+
+  // navigation helper
+  const pages = document.querySelectorAll('.page');
+  function showPage(id){
+    pages.forEach(p => p.classList.toggle('active', p.id === id));
+    // scroll to top on mobile
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if(history && history.replaceState) history.replaceState(null, '', '#'+id);
+    else location.hash = id;
+  }
+  function navigate(key){
+    if(key === 'home') {
+      // hide all pages and scroll top
+      pages.forEach(p=>p.classList.remove('active'));
+      // nothing else: main card is always visible (it's not a .page)
+      window.scrollTo({top:0,behavior:'smooth'});
+      if(history && history.replaceState) history.replaceState(null,'','#');
+    } else showPage(key);
+  }
+
+  // Buttons
+  const btnYes = document.getElementById('btnYes');
+  const btnNo = document.getElementById('btnNo');
+  const btnProceedIG = document.getElementById('btnProceedIG');
+  const yesNotice = document.getElementById('yesNotice');
+  const noForm = document.getElementById('noForm');
+  const noFeedbackMsg = document.getElementById('noFeedbackMsg');
+
+  btnYes.addEventListener('click', ()=> showPage('yes'));
+  btnNo.addEventListener('click', ()=> showPage('no'));
+
+  // Form submission (Formspree)
+  if(noForm){
+    noForm.addEventListener('submit', async (e)=>{
+      e.preventDefault();
+      const formData = new FormData(noForm);
+      try{
+        const res = await fetch(noForm.action, {
+          method: 'POST',
+          body: formData,
+          headers: { 'Accept': 'application/json' }
+        });
+        // success paths
+        noForm.style.display = 'none';
+        noFeedbackMsg.style.display = 'block';
+        // optionally navigate home after short delay
+        setTimeout(()=>navigate('home'), 1800);
+      }catch(err){
+        alert('Bir hata oluştu, lütfen tekrar deneyin.');
+      }
+    });
+  }
+
+  // --- Confetti (high-DPI aware) ---
+  (function(){
+    const canvas = document.getElementById('confettiCanvas');
+    const ctx = canvas.getContext('2d');
+    let W, H, dpr;
+    let particles = [], running = false;
+
+    function resize(){
+      dpr = window.devicePixelRatio || 1;
+      W = canvas.width = Math.round(window.innerWidth * dpr);
+      H = canvas.height = Math.round(window.innerHeight * dpr);
+      canvas.style.width = window.innerWidth + 'px';
+      canvas.style.height = window.innerHeight + 'px';
+      ctx.setTransform(dpr,0,0,dpr,0,0);
+    }
+    window.addEventListener('resize', resize);
+    resize();
+
+    function rand(min,max){return Math.random()*(max-min)+min}
+
+    function spawn(x,y,count){
+      for(let i=0;i<count;i++){
+        particles.push({
+          x: x + rand(-40,40),
+          y: y + rand(-20,20),
+          vx: rand(-5,5),
+          vy: rand(-10,-3),
+          size: rand(6,12),
+          rot: rand(0,360),
+          vrot: rand(-6,6),
+          life: rand(1400,3000),
+          age:0,
+          color: `hsl(${~~rand(0,360)},70%,60%)`,
+          gravity: 0.06 + rand(0,0.03)
+        });
+      }
+    }
+
+    function update(dt){
+      for(let i=particles.length-1;i>=0;i--){
+        const p = particles[i];
+        p.age += dt;
+        p.vy += p.gravity * (dt/16);
+        p.x += p.vx * (dt/16);
+        p.y += p.vy * (dt/16);
+        p.rot += p.vrot * (dt/16);
+        if(p.age > p.life || p.y > window.innerHeight + 40) particles.splice(i,1);
+      }
+    }
+
+    function draw(){
+      ctx.clearRect(0,0,window.innerWidth,window.innerHeight);
+      for(const p of particles){
+        ctx.save();
+        ctx.translate(p.x, p.y);
+        ctx.rotate(p.rot * Math.PI/180);
+        ctx.fillStyle = p.color;
+        ctx.fillRect(-p.size/2, -p.size/2, p.size, p.size*0.6);
+        ctx.restore();
+      }
+    }
+
+    let last = performance.now();
+    function loop(now){
+      const dt = Math.min(40, now - last);
+      last = now;
+      update(dt);
+      draw();
+      if(running) requestAnimationFrame(loop);
+      else { ctx.clearRect(0,0,window.innerWidth,window.innerHeight); }
+    }
+
+    window.fireConfetti = function({x=null,y=null,count=110,duration=1800} = {}){
+      if(running) return;
+      running = true;
+      last = performance.now();
+      const cx = x !== null ? x : window.innerWidth/2;
+      const cy = y !== null ? y : window.innerHeight/3;
+      spawn(cx, cy, count);
+      // small trailing bursts
+      const ticks = 4;
+      for(let i=1;i<=ticks;i++){
+        setTimeout(()=>spawn(cx + rand(-80,80), cy - rand(20,160), ~~rand(18,36)), i*(duration/(ticks*1.6)));
+      }
+      requestAnimationFrame(loop);
+      setTimeout(()=>{ running = false; particles = []; }, duration + 250);
+    };
+  })();
+
+  // proceed to instagram: confetti + open new tab + go to goodbye page
+  if(btnProceedIG){
+    btnProceedIG.addEventListener('click', ()=>{
+      btnProceedIG.disabled = true;
+      btnProceedIG.textContent = 'Hazırlanıyor...';
+      yesNotice.style.display = 'block';
+
+      // get button center for confetti origin
+      const rect = btnProceedIG.getBoundingClientRect();
+      const cx = rect.left + rect.width/2;
+      const cy = rect.top + rect.height/2;
+
+      window.fireConfetti({x:cx,y:cy,count:160,duration:2200});
+
+      setTimeout(()=>{
+        try{ window.open(INSTAGRAM_URL, '_blank'); }
+        catch(e){ location.href = INSTAGRAM_URL; return; }
+        showPage('goodbyePage');
+        btnProceedIG.disabled = false;
+        btnProceedIG.textContent = "Instagram'a Git";
+      }, 800);
+    });
+  }
+
+  // keyboard accessibility (Enter)
+  [document.getElementById('btnYes'), document.getElementById('btnNo'), document.getElementById('btnProceedIG')].forEach(b=>{
+    if(b) b.addEventListener('keydown', e=>{ if(e.key==='Enter') e.click(); });
+  });
+
+  // on load: show home (no hash) or page if hash exists
+  window.addEventListener('load', ()=>{
+    const h = (location.hash||'').replace('#','');
+    if(h && document.getElementById(h)) showPage(h);
+    else navigate('home');
+  });
+</script>
+</body>
+</html>
